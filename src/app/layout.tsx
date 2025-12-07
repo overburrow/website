@@ -1,15 +1,16 @@
-import type { Metadata } from "next";
 import "./globals.css";
+import type { Metadata } from "next";
+import { iosevka } from "./_fonts";
 
 export const metadata: Metadata = {
 	title: "overburrow",
-	description: "gophers digging too far",
+	description: "overdigging gophers",
 };
 
 const RootLayout = ({ children }: LayoutProps<"/">) => {
 	return (
 		<html lang="en">
-			<body className={`antialiased`}>{children}</body>
+			<body className={`${iosevka.className} antialiased`}>{children}</body>
 		</html>
 	);
 };
