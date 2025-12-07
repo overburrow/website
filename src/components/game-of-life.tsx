@@ -4,8 +4,8 @@ import { ComponentProps, memo, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 
 const FPS = 8;
-const INITIAL_LIFE_CHANCE = 0.2;
-const RANDOM_REVIVAL_CHANCE = 0;
+const INITIAL_LIFE_CHANCE = 0.15;
+const REVIVAL_CHANCE = 0.001;
 const CELL_SIZE = 40;
 const FONT_SIZE = 14;
 const ASCII = " ·+#@";
@@ -61,7 +61,7 @@ const GameOfLife = memo(({ className }: ComponentProps<"div">) => {
 					const age = currentMatrix[y][x];
 					const neighbors = countNeighbors(currentMatrix, x, y);
 					const isLive =
-						Math.random() < RANDOM_REVIVAL_CHANCE ||
+						Math.random() < REVIVAL_CHANCE ||
 						(currentMatrix[y][x] > 0 ? neighbors === 2 : neighbors === 3);
 
 					newMatrix[y][x] = isLive
