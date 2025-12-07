@@ -6,6 +6,7 @@ export const metadata: Metadata = {
 	title: "overburrow",
 	description: "overdigging gophers",
 	keywords: [
+		"overburrow",
 		"kubernetes",
 		"docker",
 		"go",
@@ -18,6 +19,10 @@ export const metadata: Metadata = {
 		"project",
 		"raspberry pi",
 		"homelab",
+		"networking",
+		"college",
+		"computer",
+		"server",
 	],
 };
 
