@@ -7,8 +7,8 @@ import GameOfLife from "@/components/game-of-life";
 const HomePage = () => {
 	return (
 		<main className="flex flex-col items-center justify-center w-svw h-svh relative">
-			<GameOfLife className="absolute -z-40 opacity-50!" />
 			<Logo size={200} />
+			<GameOfLife className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-50 z-10 pointer-events-none" />
 			<motion.h1
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}

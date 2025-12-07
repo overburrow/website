@@ -4,9 +4,9 @@ import { ComponentProps, memo, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 
 const FPS = 8;
-const INITIAL_LIFE_CHANCE = 0.15;
-const REVIVAL_CHANCE = 0.001;
-const CELL_SIZE = 40;
+const INITIAL_LIFE_CHANCE = 0.4;
+const REVIVAL_CHANCE = 0.03;
+const CELL_SIZE = 20;
 const FONT_SIZE = 14;
 const ASCII = " ·+#@";
 
@@ -98,7 +98,7 @@ const GameOfLife = memo(({ className }: ComponentProps<"div">) => {
 		ctx.scale(dpr, dpr);
 
 		const style = getComputedStyle(container);
-		const textColor = style.getPropertyValue("--foreground");
+		const textColor = style.getPropertyValue("--background");
 
 		ctx.clearRect(0, 0, width, height);
 		ctx.font = `${FONT_SIZE}px Iosevka`;
@@ -124,8 +124,8 @@ const GameOfLife = memo(({ className }: ComponentProps<"div">) => {
 			ref={containerRef}
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
-			transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
-			className={`${className} size-full`}
+			transition={{ delay: 1, duration: 0.5, ease: "easeOut" }}
+			className={className}
 		>
 			<canvas ref={canvasRef} />
 		</motion.div>
