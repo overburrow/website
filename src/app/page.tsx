@@ -2,21 +2,35 @@
 
 import { motion } from "motion/react";
 import { Logo } from "@/components/logo";
-import GameOfLife from "@/components/game-of-life";
+import { useTheme } from "next-themes";
 
 const HomePage = () => {
+	const { theme } = useTheme();
 	return (
 		<main className="flex flex-col items-center justify-center w-svw h-svh relative">
 			<Logo size={200} />
-			<GameOfLife className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-50 z-10 pointer-events-none" />
-			<motion.h1
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ delay: 0.8, duration: 1 }}
-				className="text-3xl font-light tracking-tighter -translate-y-2"
-			>
-				overburrow
-			</motion.h1>
+			<div className="text-center -translate-y-2">
+				<motion.h1
+					key={theme + "h1"}
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: 0.8, duration: 1 }}
+					className="text-3xl font-light tracking-tighter leading-none"
+				>
+					overburrow
+				</motion.h1>
+				{
+					// <motion.p
+					// 	key={theme + "p"}
+					// 	initial={{ opacity: 0 }}
+					// 	animate={{ opacity: 1 }}
+					// 	transition={{ delay: 1.2, duration: 1 }}
+					// 	className="text-muted-foreground"
+					// >
+					// 	overdigging gophers
+					// </motion.p>
+				}
+			</div>
 
 			<div className="sr-only">
 				<p>

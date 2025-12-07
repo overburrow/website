@@ -2,19 +2,20 @@
 
 import { ComponentProps, memo, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import { useTheme } from "next-themes";
 
-const FPS = 8;
-const INITIAL_LIFE_CHANCE = 0.4;
+const FPS = 2;
+const INITIAL_LIFE_CHANCE = 0.3;
 const REVIVAL_CHANCE = 0.03;
 const CELL_SIZE = 20;
 const FONT_SIZE = 14;
-const ASCII = " ·+#@";
+const ASCII = " ·+#";
 
 const GameOfLife = memo(({ className }: ComponentProps<"div">) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [matrix, setMatrix] = useState<number[][]>([]);
-
+	const { theme } = useTheme();
 	const currentMatrixRef = useRef<number[][]>([]);
 
 	useEffect(() => {
@@ -122,9 +123,10 @@ const GameOfLife = memo(({ className }: ComponentProps<"div">) => {
 	return (
 		<motion.div
 			ref={containerRef}
+			key={theme}
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
-			transition={{ delay: 1, duration: 0.5, ease: "easeOut" }}
+			transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
 			className={className}
 		>
 			<canvas ref={canvasRef} />
