@@ -49,7 +49,7 @@ const Hero = ({ className }: ComponentProps<"div">) => {
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ delay: 1.5 }}
-					className="text-muted-foreground *:hover:text-foreground *:transition-colors mt-5 flex gap-4 justify-center"
+					className="text-muted-foregrOund *:hover:text-foreground *:transition-colors mt-5 flex gap-4 justify-center"
 				>
 					<Link href="/stats">
 						<ChartBarIcon className="size-4" />
