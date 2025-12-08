@@ -4,135 +4,153 @@ import { ComponentProps, memo, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 
-const FPS = 2;
-const INITIAL_LIFE_CHANCE = 0.3;
-const REVIVAL_CHANCE = 0.03;
-const CELL_SIZE = 20;
-const FONT_SIZE = 14;
-const ASCII = " ·+#";
+type GameOfLifeProps = {
+	fps?: number;
+	charSet?: string;
+	invertColor?: boolean;
+	cellSize?: number;
+	fontSize?: number;
+	initialLifeChance?: number;
+	revivalChance?: number;
+	opacity?: number;
+} & ComponentProps<"div">;
 
-const GameOfLife = memo(({ className }: ComponentProps<"div">) => {
-	const containerRef = useRef<HTMLDivElement>(null);
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [matrix, setMatrix] = useState<number[][]>([]);
-	const { theme } = useTheme();
-	const currentMatrixRef = useRef<number[][]>([]);
+const GameOfLife = memo(
+	({
+		invertColor = false,
+		fps = 2,
+		charSet = " ·+#",
+		cellSize = 20,
+		fontSize = 14,
+		initialLifeChance = 0.3,
+		revivalChance = 0.03,
+		opacity = 1,
+		className,
+	}: GameOfLifeProps) => {
+		const containerRef = useRef<HTMLDivElement>(null);
+		const canvasRef = useRef<HTMLCanvasElement>(null);
+		const [matrix, setMatrix] = useState<number[][]>([]);
+		const { theme } = useTheme();
+		const currentMatrixRef = useRef<number[][]>([]);
 
-	useEffect(() => {
-		currentMatrixRef.current = matrix;
-	}, [matrix]);
+		useEffect(() => {
+			currentMatrixRef.current = matrix;
+		}, [matrix]);
 
-	// initial matrix
-	useEffect(() => {
-		const container = containerRef.current;
-		if (!container) return;
+		// initial matrix
+		useEffect(() => {
+			const container = containerRef.current;
+			if (!container) return;
 
-		const { width, height } = container.getBoundingClientRect();
-		const rows = Math.ceil(height / CELL_SIZE);
-		const cols = Math.ceil(width / CELL_SIZE);
+			const { width, height } = container.getBoundingClientRect();
+			const rows = Math.ceil(height / cellSize);
+			const cols = Math.ceil(width / cellSize);
 
-		const initialMatrix = Array.from({ length: rows }, () =>
-			Array.from({ length: cols }, () =>
-				Math.random() < INITIAL_LIFE_CHANCE
-					? Math.floor(Math.random() * ASCII.length)
-					: 0,
-			),
+			const initialMatrix = Array.from({ length: rows }, () =>
+				Array.from({ length: cols }, () =>
+					Math.random() < initialLifeChance
+						? Math.floor(Math.random() * charSet.length)
+						: 0,
+				),
+			);
+
+			setMatrix(initialMatrix);
+		}, []);
+
+		// game loop
+		useEffect(() => {
+			const interval = 1000 / fps;
+			const loop = setInterval(() => {
+				const currentMatrix = currentMatrixRef.current;
+				if (
+					!currentMatrix ||
+					currentMatrix.length === 0 ||
+					currentMatrix[0].length === 0
+				) {
+					return;
+				}
+
+				const newMatrix = currentMatrix.map((row) => [...row]);
+
+				for (let y = 0; y < currentMatrix.length; y++) {
+					for (let x = 0; x < currentMatrix[0].length; x++) {
+						const age = currentMatrix[y][x];
+						const neighbors = countNeighbors(currentMatrix, x, y);
+						const isLive =
+							Math.random() < revivalChance ||
+							(currentMatrix[y][x] > 0 ? neighbors === 2 : neighbors === 3);
+
+						newMatrix[y][x] = isLive
+							? Math.min(charSet.length - 1, age + 1)
+							: Math.max(0, age - 1);
+					}
+				}
+
+				setMatrix(newMatrix);
+			}, interval);
+
+			return () => {
+				clearInterval(loop);
+			};
+		}, []);
+
+		// draw matrix
+		useEffect(() => {
+			const canvas = canvasRef.current;
+			const container = containerRef.current;
+			if (!canvas || !container || matrix.length === 0) return;
+
+			const { width, height } = container.getBoundingClientRect();
+			const dpr = window.devicePixelRatio || 1;
+
+			canvas.width = width * dpr;
+			canvas.height = height * dpr;
+			canvas.style.width = `${width}px`;
+			canvas.style.height = `${height}px`;
+
+			const ctx = canvas.getContext("2d");
+			if (!ctx) return;
+
+			ctx.scale(dpr, dpr);
+
+			const style = getComputedStyle(container);
+			const textColor = style.getPropertyValue(
+				invertColor ? "--foreground" : "--background",
+			);
+
+			ctx.clearRect(0, 0, width, height);
+			ctx.font = `${fontSize}px Iosevka`;
+			ctx.fillStyle = textColor;
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+
+			for (let y = 0; y < matrix.length; y++) {
+				for (let x = 0; x < matrix[y].length; x++) {
+					const age = matrix[y][x];
+					if (age > 0) {
+						const character = charSet[age];
+						const centerX = x * cellSize + cellSize / 2;
+						const centerY = y * cellSize + cellSize / 2;
+						ctx.fillText(character, centerX, centerY);
+					}
+				}
+			}
+		}, [matrix]);
+
+		return (
+			<motion.div
+				ref={containerRef}
+				key={theme}
+				initial={{ opacity: 0 }}
+				animate={{ opacity }}
+				transition={{ delay: 0.3, duration: 0.5, ease: "easeOut" }}
+				className={className}
+			>
+				<canvas ref={canvasRef} />
+			</motion.div>
 		);
-
-		setMatrix(initialMatrix);
-	}, []);
-
-	// game loop
-	useEffect(() => {
-		const interval = 1000 / FPS;
-		const loop = setInterval(() => {
-			const currentMatrix = currentMatrixRef.current;
-			if (
-				!currentMatrix ||
-				currentMatrix.length === 0 ||
-				currentMatrix[0].length === 0
-			) {
-				return;
-			}
-
-			const newMatrix = currentMatrix.map((row) => [...row]);
-
-			for (let y = 0; y < currentMatrix.length; y++) {
-				for (let x = 0; x < currentMatrix[0].length; x++) {
-					const age = currentMatrix[y][x];
-					const neighbors = countNeighbors(currentMatrix, x, y);
-					const isLive =
-						Math.random() < REVIVAL_CHANCE ||
-						(currentMatrix[y][x] > 0 ? neighbors === 2 : neighbors === 3);
-
-					newMatrix[y][x] = isLive
-						? Math.min(ASCII.length - 1, age + 1)
-						: Math.max(0, age - 1);
-				}
-			}
-
-			setMatrix(newMatrix);
-		}, interval);
-
-		return () => {
-			clearInterval(loop);
-		};
-	}, []);
-
-	// draw matrix
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		const container = containerRef.current;
-		if (!canvas || !container || matrix.length === 0) return;
-
-		const { width, height } = container.getBoundingClientRect();
-		const dpr = window.devicePixelRatio || 1;
-
-		canvas.width = width * dpr;
-		canvas.height = height * dpr;
-		canvas.style.width = `${width}px`;
-		canvas.style.height = `${height}px`;
-
-		const ctx = canvas.getContext("2d");
-		if (!ctx) return;
-
-		ctx.scale(dpr, dpr);
-
-		const style = getComputedStyle(container);
-		const textColor = style.getPropertyValue("--background");
-
-		ctx.clearRect(0, 0, width, height);
-		ctx.font = `${FONT_SIZE}px Iosevka`;
-		ctx.fillStyle = textColor;
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-
-		for (let y = 0; y < matrix.length; y++) {
-			for (let x = 0; x < matrix[y].length; x++) {
-				const age = matrix[y][x];
-				if (age > 0) {
-					const character = ASCII[age];
-					const centerX = x * CELL_SIZE + CELL_SIZE / 2;
-					const centerY = y * CELL_SIZE + CELL_SIZE / 2;
-					ctx.fillText(character, centerX, centerY);
-				}
-			}
-		}
-	}, [matrix]);
-
-	return (
-		<motion.div
-			ref={containerRef}
-			key={theme}
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
-			className={className}
-		>
-			<canvas ref={canvasRef} />
-		</motion.div>
-	);
-});
+	},
+);
 GameOfLife.displayName = "GameOfLife";
 
 export default GameOfLife;
