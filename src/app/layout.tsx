@@ -5,8 +5,9 @@ import { ThemeProvider } from "next-themes";
 import GameOfLife from "@/components/game-of-life";
 
 export const metadata: Metadata = {
-	title: "overburrow",
-	description: "overdigging gophers",
+	title: "Overburrow | Kubernetes homelab made by overdigging gophers",
+	description:
+		"K3s running on a pair of Raspberry Pis. We break things and learn the hard way to fix them.",
 	keywords: [
 		"overburrow",
 		"kubernetes",
@@ -56,6 +57,7 @@ export default HomeLayout;
 const GhostText = () => {
 	return (
 		<div className="sr-only">
+			<h1>Overburrow, a kubernetes homelab made by overdigging gophers</h1>
 			<p>
 				Project overburrow is created by two college students studying Computer
 				Science, Ethan (Taehoon) Lee and Taeeun Kim. We are passionate in

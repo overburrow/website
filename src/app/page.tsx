@@ -28,14 +28,14 @@ const Hero = ({ className }: ComponentProps<"div">) => {
 			<Logo size={200} animated onClick={toggleTheme} />
 
 			<div className="text-center -translate-y-2">
-				<motion.h1
+				<motion.h2
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.8, duration: 1 }}
 					className="text-3xl font-light tracking-tighter leading-tight"
 				>
 					overburrow
-				</motion.h1>
+				</motion.h2>
 				<motion.p
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
