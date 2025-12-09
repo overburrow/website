@@ -1,8 +1,17 @@
 "use client";
 
-import { ComponentProps, memo, useEffect, useRef, useState } from "react";
+import { ComponentProps, memo, useCallback, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
+import { useMouse } from "@/hooks/use-mouse";
+
+export const algorithmMap = {
+	0: (age, neighbors) => (age > 0 ? neighbors === 2 : neighbors === 3),
+	1: (age, neighbors) => (age > 0 ? neighbors < 6 : neighbors > 3),
+	2: (age, neighbors) => (age > 0 ? neighbors === 4 : neighbors === 2),
+} satisfies Record<number, (age: number, neighbors: number) => boolean>;
+
+export type Algorithm = keyof typeof algorithmMap;
 
 type GameOfLifeProps = {
 	fps?: number;
@@ -13,31 +22,78 @@ type GameOfLifeProps = {
 	initialLifeChance?: number;
 	revivalChance?: number;
 	opacity?: number;
+	algorithm?: keyof typeof algorithmMap;
+	mouseRange?: number;
 } & ComponentProps<"div">;
 
-const GameOfLife = memo(
+export const GameOfLife = memo(
 	({
 		invertColor = false,
-		fps = 2,
+		fps = 30,
 		charSet = " ·+#",
 		cellSize = 20,
 		fontSize = 14,
-		initialLifeChance = 0.3,
-		revivalChance = 0.03,
+		initialLifeChance = 0.2,
+		revivalChance = 0,
 		opacity = 1,
+		mouseRange = 20,
+		algorithm = 0,
 		className,
 	}: GameOfLifeProps) => {
 		const containerRef = useRef<HTMLDivElement>(null);
 		const canvasRef = useRef<HTMLCanvasElement>(null);
-		const [matrix, setMatrix] = useState<number[][]>([]);
+		const matrixRef = useRef<number[][]>([]);
 		const { theme } = useTheme();
-		const currentMatrixRef = useRef<number[][]>([]);
+		const mouse = useMouse();
 
-		useEffect(() => {
-			currentMatrixRef.current = matrix;
-		}, [matrix]);
+		const draw = useCallback(
+			(currentMatrix: number[][]) => {
+				const canvas = canvasRef.current;
+				const container = containerRef.current;
+				if (!canvas || !container || currentMatrix.length === 0) return;
 
-		// initial matrix
+				const { width, height } = container.getBoundingClientRect();
+				const dpr = window.devicePixelRatio || 1;
+
+				if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+					canvas.width = width * dpr;
+					canvas.height = height * dpr;
+					canvas.style.width = `${width}px`;
+					canvas.style.height = `${height}px`;
+					const ctx = canvas.getContext("2d");
+					if (ctx) ctx.scale(dpr, dpr);
+				}
+
+				const ctx = canvas.getContext("2d");
+				if (!ctx) return;
+
+				const style = getComputedStyle(container);
+				const textColor = style.getPropertyValue(
+					invertColor ? "--background" : "--foreground",
+				);
+
+				ctx.clearRect(0, 0, width, height);
+				ctx.font = `${fontSize}px Iosevka`;
+				ctx.fillStyle = textColor;
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+
+				for (let y = 0; y < currentMatrix.length; y++) {
+					for (let x = 0; x < currentMatrix[y].length; x++) {
+						const age = currentMatrix[y][x];
+						if (age > 0) {
+							const character = charSet[age] ?? charSet[charSet.length - 1];
+							const centerX = x * cellSize + cellSize / 2;
+							const centerY = y * cellSize + cellSize / 2;
+							ctx.fillText(character, centerX, centerY);
+						}
+					}
+				}
+			},
+			[cellSize, charSet, fontSize, invertColor],
+		);
+
+		// initial draw
 		useEffect(() => {
 			const container = containerRef.current;
 			if (!container) return;
@@ -46,7 +102,7 @@ const GameOfLife = memo(
 			const rows = Math.ceil(height / cellSize);
 			const cols = Math.ceil(width / cellSize);
 
-			const initialMatrix = Array.from({ length: rows }, () =>
+			matrixRef.current = Array.from({ length: rows }, () =>
 				Array.from({ length: cols }, () =>
 					Math.random() < initialLifeChance
 						? Math.floor(Math.random() * charSet.length)
@@ -54,88 +110,71 @@ const GameOfLife = memo(
 				),
 			);
 
-			setMatrix(initialMatrix);
-		}, []);
+			draw(matrixRef.current);
+		}, [cellSize, initialLifeChance, charSet.length, draw]);
 
 		// game loop
 		useEffect(() => {
 			const interval = 1000 / fps;
 			const loop = setInterval(() => {
-				const currentMatrix = currentMatrixRef.current;
-				if (
-					!currentMatrix ||
-					currentMatrix.length === 0 ||
-					currentMatrix[0].length === 0
-				) {
-					return;
-				}
+				const prevMatrix = matrixRef.current;
+				if (prevMatrix.length === 0) return;
 
-				const newMatrix = currentMatrix.map((row) => [...row]);
+				const nextMatrix = prevMatrix.map((row) => [...row]);
 
-				for (let y = 0; y < currentMatrix.length; y++) {
-					for (let x = 0; x < currentMatrix[0].length; x++) {
-						const age = currentMatrix[y][x];
-						const neighbors = countNeighbors(currentMatrix, x, y);
+				for (let y = 0; y < prevMatrix.length; y++) {
+					for (let x = 0; x < prevMatrix[0].length; x++) {
+						const age = prevMatrix[y][x];
+						const neighbors = countNeighbors(prevMatrix, x, y);
 						const isLive =
 							Math.random() < revivalChance ||
-							(currentMatrix[y][x] > 0 ? neighbors === 2 : neighbors === 3);
+							algorithmMap[algorithm](age, neighbors);
 
-						newMatrix[y][x] = isLive
+						nextMatrix[y][x] = isLive
 							? Math.min(charSet.length - 1, age + 1)
 							: Math.max(0, age - 1);
 					}
 				}
 
-				setMatrix(newMatrix);
+				matrixRef.current = nextMatrix;
+				draw(nextMatrix);
 			}, interval);
 
-			return () => {
-				clearInterval(loop);
-			};
-		}, []);
+			return () => clearInterval(loop);
+		}, [fps, revivalChance, algorithm, charSet.length, draw]);
 
-		// draw matrix
+		// track mouse
 		useEffect(() => {
 			const canvas = canvasRef.current;
-			const container = containerRef.current;
-			if (!canvas || !container || matrix.length === 0) return;
+			if (!canvas || matrixRef.current.length === 0) return;
 
-			const { width, height } = container.getBoundingClientRect();
-			const dpr = window.devicePixelRatio || 1;
+			const { x: canvasX, y: canvasY } = canvas.getBoundingClientRect();
+			let changed = false;
+			const currentMatrix = matrixRef.current;
 
-			canvas.width = width * dpr;
-			canvas.height = height * dpr;
-			canvas.style.width = `${width}px`;
-			canvas.style.height = `${height}px`;
+			for (let y = 0; y < currentMatrix.length; y++) {
+				for (let x = 0; x < currentMatrix[y].length; x++) {
+					const location = {
+						x: canvasX + cellSize * x + mouseRange / 2,
+						y: canvasY + cellSize * y + mouseRange / 2,
+					};
+					const distFromMouse = Math.sqrt(
+						Math.pow(mouse.x - location.x, 2) +
+							Math.pow(mouse.y - location.y, 2),
+					);
 
-			const ctx = canvas.getContext("2d");
-			if (!ctx) return;
-
-			ctx.scale(dpr, dpr);
-
-			const style = getComputedStyle(container);
-			const textColor = style.getPropertyValue(
-				invertColor ? "--foreground" : "--background",
-			);
-
-			ctx.clearRect(0, 0, width, height);
-			ctx.font = `${fontSize}px Iosevka`;
-			ctx.fillStyle = textColor;
-			ctx.textAlign = "center";
-			ctx.textBaseline = "middle";
-
-			for (let y = 0; y < matrix.length; y++) {
-				for (let x = 0; x < matrix[y].length; x++) {
-					const age = matrix[y][x];
-					if (age > 0) {
-						const character = charSet[age];
-						const centerX = x * cellSize + cellSize / 2;
-						const centerY = y * cellSize + cellSize / 2;
-						ctx.fillText(character, centerX, centerY);
+					if (distFromMouse < mouseRange) {
+						currentMatrix[y][x] = Math.min(
+							charSet.length - 1,
+							currentMatrix[y][x] + 1,
+						);
+						changed = true;
 					}
 				}
 			}
-		}, [matrix]);
+
+			if (changed) draw(currentMatrix);
+		}, [mouse, cellSize, mouseRange, charSet.length, draw]);
 
 		return (
 			<motion.div
@@ -151,9 +190,8 @@ const GameOfLife = memo(
 		);
 	},
 );
-GameOfLife.displayName = "GameOfLife";
 
-export default GameOfLife;
+GameOfLife.displayName = "GameOfLife";
 
 const countNeighbors = (matrix: number[][], x: number, y: number) => {
 	let count = 0;

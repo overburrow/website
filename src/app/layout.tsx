@@ -2,7 +2,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { iosevka } from "./_fonts";
 import { ThemeProvider } from "next-themes";
-import GameOfLife from "@/components/game-of-life";
 
 export const metadata: Metadata = {
 	title: "Overburrow | Kubernetes homelab made by overdigging gophers",
@@ -35,16 +34,6 @@ const HomeLayout = ({ children }: LayoutProps<"/">) => {
 			<body className={`${iosevka.className} antialiased`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					<GhostText />
-					<GameOfLife
-						invertColor
-						fps={10}
-						cellSize={20}
-						fontSize={8}
-						initialLifeChance={0.1}
-						revivalChance={0.01}
-						opacity={0.2}
-						className="fixed right-0 top-0 size-full -z-40"
-					/>
 					{children}
 				</ThemeProvider>
 			</body>

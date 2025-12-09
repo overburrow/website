@@ -73,6 +73,7 @@ const LogoAnimated = () => {
 			viewBox={`-80 -86 160 160`}
 			initial="hidden"
 			animate="visible"
+			whileTap={{ scale: 0.98 }}
 			className="cursor-pointer"
 		>
 			<defs>

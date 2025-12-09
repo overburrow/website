@@ -10,7 +10,6 @@ export const ThemeButton = ({ className }: ComponentProps<"button">) => {
 
 	const toggleTheme = () => {
 		setTheme((prev) => (prev === "light" ? "dark" : "light"));
-		console.log(theme);
 	};
 
 	return (
