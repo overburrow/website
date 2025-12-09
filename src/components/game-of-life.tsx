@@ -7,8 +7,9 @@ import { useMouse } from "@/hooks/use-mouse";
 
 export const algorithmMap = {
 	0: (age, neighbors) => (age > 0 ? neighbors === 2 : neighbors === 3),
-	1: (age, neighbors) => (age > 0 ? neighbors < 6 : neighbors > 3),
-	2: (age, neighbors) => (age > 0 ? neighbors === 4 : neighbors === 2),
+	1: (age, neighbors) =>
+		age > 1 ? neighbors < 4 : 1 < neighbors && neighbors < 3,
+	2: (age, neighbors) => (age > 0 ? neighbors === 5 : neighbors > 4),
 } satisfies Record<number, (age: number, neighbors: number) => boolean>;
 
 export type Algorithm = keyof typeof algorithmMap;
@@ -164,10 +165,7 @@ export const GameOfLife = memo(
 					);
 
 					if (distFromMouse < mouseRange) {
-						currentMatrix[y][x] = Math.min(
-							charSet.length - 1,
-							currentMatrix[y][x] + 1,
-						);
+						currentMatrix[y][x] = charSet.length - 1;
 						changed = true;
 					}
 				}
