@@ -18,8 +18,8 @@ const nodes = [
 	{
 		name: "burrow-3",
 		stats: [
-			{ label: "cpu", value: 0.5 },
-			{ label: "ram", value: 0.4 },
+			{ label: "cpu", value: 0.2 },
+			{ label: "ram", value: 0.3 },
 			{ label: "disk", value: 0.1 },
 		],
 	},
