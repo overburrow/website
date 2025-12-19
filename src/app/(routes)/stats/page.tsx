@@ -1,6 +1,6 @@
 const nodes = [
 	{
-		name: "node-1",
+		name: "burrow-1",
 		stats: [
 			{ label: "cpu", value: 0.3 },
 			{ label: "ram", value: 0.5 },
@@ -8,7 +8,15 @@ const nodes = [
 		],
 	},
 	{
-		name: "node-2",
+		name: "burrow-2",
+		stats: [
+			{ label: "cpu", value: 0.5 },
+			{ label: "ram", value: 0.4 },
+			{ label: "disk", value: 0.1 },
+		],
+	},
+	{
+		name: "burrow-3",
 		stats: [
 			{ label: "cpu", value: 0.5 },
 			{ label: "ram", value: 0.4 },
