@@ -1,0 +1,5 @@
+.git
+.DS_Store
+.next
+node_modules
+README.md
