@@ -16,8 +16,8 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: overburrow/charts/.github/workflows/release.yaml@main
+    uses: overburrow/infra/.github/workflows/release.yaml@main
     with:
-      image_name: homepage
+      image_name: website
       image_tag: ${{ github.sha }}
       dockerfile_path: ./Dockerfile
