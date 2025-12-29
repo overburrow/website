@@ -1,8 +1,9 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import { iosevka } from "@/lib/fonts";
 import { Nav } from "@/components/nav";
+import { iosevka } from "@/lib/fonts";
+import type { Metadata } from "next";
 import { ViewTransition } from "react";
+
+import "./globals.css";
 
 const HomeLayout = ({ children }: LayoutProps<"/">) => {
   return (

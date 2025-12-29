@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
 import { Logo } from "@/components/logo";
+import { motion } from "motion/react";
 
 const HomePage = () => {
   return (

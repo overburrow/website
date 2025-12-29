@@ -1,13 +1,18 @@
 "use client";
 
 import { navConfig } from "@/lib/config/nav";
+import {
+  IconBrightnessUpFilled,
+  IconExternalLink,
+  IconMoonFilled,
+} from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  createContext,
   Dispatch,
   SetStateAction,
+  createContext,
   useContext,
   useEffect,
   useRef,
@@ -17,11 +22,7 @@ import {
   ThemeAnimationType,
   useModeAnimation,
 } from "react-theme-switch-animation";
-import {
-  IconBrightnessUpFilled,
-  IconExternalLink,
-  IconMoonFilled,
-} from "@tabler/icons-react";
+
 import { Logo } from "./logo";
 
 type NavContext = {
