@@ -8,7 +8,13 @@ import "./globals.css";
 const HomeLayout = ({ children }: LayoutProps<"/">) => {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${iosevka.className} antialiased min-h-svh pt-15`}>
+      <head>
+        <link
+          href="https://iosevka-webfonts.github.io/iosevka/Iosevka.css"
+          rel="stylesheet"
+        />
+      </head>
+      <body className={`antialiased min-h-svh pt-15`}>
         <ViewTransition>
           <GhostText />
           <Nav />

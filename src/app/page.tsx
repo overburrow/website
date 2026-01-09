@@ -1,31 +1,22 @@
-"use client";
-
+import { GameOfLife } from "@/components/game-of-life";
 import { Logo } from "@/components/logo";
-import { motion } from "motion/react";
 
 const HomePage = () => {
   return (
     <main>
+      <GameOfLife
+        opacity={0.5}
+        className="w-svw h-svh fixed top-0 left-0 -z-10"
+      />
+
       <div className="absolute top-1/2 left-1/2 -translate-1/2 flex flex-col items-center">
-        <Logo size={160} animated />
+        <Logo size={160} animated className="mb-1" />
 
         <div className="text-center -translate-y-2">
-          <motion.h2
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 1 }}
-            className="text-2xl font-light tracking-tighter leading-tight"
-          >
+          <h2 className="text-3xl tracking-tighter leading-tight">
             overburrow
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 1 }}
-            className="text-muted-foreground text-sm"
-          >
-            overdigging gophers
-          </motion.p>
+          </h2>
+          <p className="text-muted-foreground">overdigging gophers</p>
         </div>
       </div>
     </main>

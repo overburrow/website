@@ -54,9 +54,12 @@ export const Nav = () => {
   return (
     <nav className="fixed w-full flex items-center justify-between top-0 left-0 p-4">
       <NavContext.Provider value={{ rect, setRect }}>
-        <Logo animated size={20} />
+        <Logo size={20} />
 
-        <div ref={ref} className="relative flex p-1 outline rounded-full">
+        <div
+          ref={ref}
+          className="relative flex p-1 outline rounded-full backdrop-blur-xs"
+        >
           {rect && parentRect && (
             <motion.div
               animate={{
@@ -113,7 +116,7 @@ const NavItem = ({ name, link }: NavItemProps) => {
       ref={ref}
       href={link}
       target={isExternal ? "_blank" : "_self"}
-      className="text-sm px-2 py-0.5 flex items-center gap-1"
+      className="text px-2 py-0.5 flex items-center gap-1"
     >
       {name}
       {isExternal && (

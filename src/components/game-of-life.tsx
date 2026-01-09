@@ -8,7 +8,7 @@ export const algorithmMap = {
   0: (age, neighbors) => (age > 0 ? neighbors === 2 : neighbors === 3),
   1: (age, neighbors) =>
     age > 1 ? neighbors < 4 : 1 < neighbors && neighbors < 3,
-  2: (age, neighbors) => (age > 0 ? neighbors === 5 : neighbors > 4),
+  2: (age, neighbors) => (age > 0 ? neighbors === 4 : neighbors > 3),
 } satisfies Record<number, (age: number, neighbors: number) => boolean>;
 
 export type Algorithm = keyof typeof algorithmMap;
@@ -29,14 +29,14 @@ type GameOfLifeProps = {
 export const GameOfLife = memo(
   ({
     invertColor = false,
-    fps = 30,
-    charSet = " ·+#",
+    fps = 8,
+    charSet = " ·+#@",
     cellSize = 20,
-    fontSize = 14,
-    initialLifeChance = 0.2,
+    fontSize = 12,
+    initialLifeChance = 0.1,
     revivalChance = 0,
     opacity = 1,
-    mouseRange = 20,
+    mouseRange = 10,
     algorithm = 0,
     className,
   }: GameOfLifeProps) => {

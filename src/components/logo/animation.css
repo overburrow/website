@@ -1,0 +1,27 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --animate-breathe-lg: breathe-lg 3s ease-in-out infinite;
+  --animate-breathe-md: breathe-md 3s ease-in-out infinite;
+
+  @keyframes breathe-lg {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.10);
+    }
+  }
+
+  @keyframes breathe-md {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.03);
+    }
+  }
+}

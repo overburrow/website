@@ -16,9 +16,9 @@ type StatNodeProps = {
 export const StatNode = ({ name, ip, stats }: StatNodeProps) => {
   return (
     <div className="h-12 flex gap-4 *:not-last:pr-4 *:not-last:border-r *:flex-1">
-      <div className="leading-none flex flex-col justify-center gap-1 max-w-40">
-        <h3>{name}</h3>
-        <p className="text-muted-foreground text-xs">{ip}</p>
+      <div className="flex flex-col justify-center gap-1 max-w-40">
+        <h3 className="text leading-none">{name}</h3>
+        <p className="text-muted-foreground text-sm">{ip}</p>
       </div>
 
       <ChartContainer config={resourceChartConfig} className="h-full">
